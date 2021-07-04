@@ -5,6 +5,14 @@ import "os"
 type Config struct {
 	BearerToken string
 	DatabaseID  string
+	Wechat      Wechat
+}
+
+type Wechat struct {
+	AppID          string `yaml:"appID"`
+	AppSecret      string `yaml:"appSecret"`
+	Token          string `yaml:"token"`
+	EncodingAESKey string `yaml:"encodingAESKey"`
 }
 
 var globalConfig = &Config{}
