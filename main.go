@@ -2,17 +2,18 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"notionboy/config"
 	"notionboy/notion"
-	"os"
 )
 
 func main() {
+	config.LoadConfig(config.GetConfig())
 
 	content := notion.Content{
-		Tags: []string{"notion", "bot"},
-		Text: "#notion #bot This is second note created by bot",
+		Text: "#notion #bot This is #second #note created by bot",
 	}
 
-	databaseID := os.Getenv("DATABASE_ID")
-	notion.CreateNewRecord(context.Background(), databaseID, content)
+	res := notion.CreateNewRecord(context.Background(), config.GetConfig().DatabaseID, content)
+	fmt.Println(res)
 }
