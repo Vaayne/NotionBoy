@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	notionapi "github.com/kjk/notion"
+	"github.com/sirupsen/logrus"
 )
 
 type Notion interface {
@@ -45,39 +46,47 @@ func CreateNewRecord(ctx context.Context, databaseID string, content Content) st
 
 	for _, tag := range content.Tags {
 		selectOption := notionapi.SelectOptions{
-			ID:   "",
 			Name: tag,
 		}
 		multiSelect = append(multiSelect, selectOption)
 	}
 
-	params := notionapi.CreatePageParams{
-		ParentType: notionapi.ParentTypeDatabase,
-		ParentID:   databaseID,
-		DatabasePageProperties: &notionapi.DatabasePageProperties{
-			"Text": notionapi.DatabasePageProperty{
-				Type: "rich_text",
-				RichText: []notionapi.RichText{
-					{
-						Type: "text",
-						// PlainText: content.Text,
-						Text: &notionapi.Text{
-							Content: content.Text,
-						},
+	databasePageProperties := notionapi.DatabasePageProperties{
+		"Text": notionapi.DatabasePageProperty{
+			Type: "rich_text",
+			RichText: []notionapi.RichText{
+				{
+					Type: "text",
+					// PlainText: content.Text,
+					Text: &notionapi.Text{
+						Content: content.Text,
 					},
 				},
 			},
-			"Tags": notionapi.DatabasePageProperty{
-				Type:        "multi_select",
-				MultiSelect: multiSelect,
-			},
 		},
+	}
+
+	if multiSelect != nil {
+		databasePageProperties["Tags"] = notionapi.DatabasePageProperty{
+			Type:        "multi_select",
+			MultiSelect: multiSelect,
+		}
+	}
+	params := notionapi.CreatePageParams{
+		ParentType:             notionapi.ParentTypeDatabase,
+		ParentID:               databaseID,
+		DatabasePageProperties: &databasePageProperties,
 	}
 	client := GetNotionClient(config.GetConfig().Notion.BearerToken)
 	page, err := client.CreatePage(ctx, params)
+	var msg string
 	if err != nil {
-		return fmt.Sprintf("创建 Note 失败，失败原因, %s", err)
+		msg = fmt.Sprintf("创建 Note 失败，失败原因, %v", err)
+		logrus.Error(msg)
+	} else {
+		pageID := strings.Replace(page.ID, "-", "", -1)
+		msg = fmt.Sprintf("创建 Note 成功，如需编辑更多，请前往 https://www.notion.so/%s", pageID)
+		logrus.Info(msg)
 	}
-	pageID := strings.Replace(page.ID, "-", "", -1)
-	return fmt.Sprintf("成功创建 Note，如需编辑更多，请前往 https://www.notion.so/%s to edit.", pageID)
+	return msg
 }
