@@ -1,3 +1,8 @@
+SERVICE:
+  NAME: notion-boy
+  HOST: "0.0.0.0"
+  PORT: 8001
+
 NOTION:
   BEARER_TOKEN:
   DATABASE_ID:

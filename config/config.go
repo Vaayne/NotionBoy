@@ -9,8 +9,15 @@ import (
 )
 
 type Config struct {
-	Notion Notion `mapstructure:"NOTION"`
-	Wechat Wechat `mapstructure:"WECHAT"`
+	Notion  Notion  `mapstructure:"NOTION"`
+	Wechat  Wechat  `mapstructure:"WECHAT"`
+	Service Service `mapstructure:"SERVICE"`
+}
+
+type Service struct {
+	Name string `mapstructure:"NAME"`
+	Host string `mapstructure:"HOST"`
+	Port string `mapstructure:"PORT"`
 }
 
 type Notion struct {
