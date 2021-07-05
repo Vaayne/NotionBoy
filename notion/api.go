@@ -73,7 +73,7 @@ func CreateNewRecord(ctx context.Context, databaseID string, content Content) st
 			},
 		},
 	}
-	client := GetNotionClient(config.GetConfig().BearerToken)
+	client := GetNotionClient(config.GetConfig().Notion.BearerToken)
 	page, err := client.CreatePage(ctx, params)
 	if err != nil {
 		return fmt.Sprintf("创建 Note 失败，失败原因, %s", err)
