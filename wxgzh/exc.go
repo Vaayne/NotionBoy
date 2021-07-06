@@ -54,9 +54,7 @@ func (ex *OfficialAccount) Serve(c *gin.Context) {
 	server.SkipValidate(true)
 	//设置接收消息的处理方法
 	server.SetMessageHandler(func(msg *message.MixMessage) *message.Reply {
-		content := transformToNotionContent(msg)
-		res := notion.CreateNewRecord(c, config.GetConfig().Notion.DatabaseID, *content)
-		return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText(res)}
+		return messageHandler(c, msg)
 	})
 
 	//处理消息接收以及回复

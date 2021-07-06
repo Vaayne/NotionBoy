@@ -9,9 +9,9 @@ import (
 )
 
 type Config struct {
-	Notion  Notion  `mapstructure:"NOTION"`
-	Wechat  Wechat  `mapstructure:"WECHAT"`
-	Service Service `mapstructure:"SERVICE"`
+	Wechat    Wechat    `mapstructure:"WECHAT"`
+	Service   Service   `mapstructure:"SERVICE"`
+	Databases Databases `mapstructure:"DATABASES"`
 }
 
 type Service struct {
@@ -23,6 +23,14 @@ type Service struct {
 type Notion struct {
 	BearerToken string `mapstructure:"BEARER_TOKEN"`
 	DatabaseID  string `mapstructure:"DATABASE_ID"`
+}
+
+type Databases struct {
+	Sqlite Sqlite `mapstructure:"SQLITE"`
+}
+
+type Sqlite struct {
+	File string `mapstructure:"FILE"`
 }
 
 type Wechat struct {

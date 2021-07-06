@@ -38,7 +38,7 @@ func (c *Content) parseTags() {
 	}
 }
 
-func CreateNewRecord(ctx context.Context, databaseID string, content Content) string {
+func CreateNewRecord(ctx context.Context, notionConfig config.Notion, content Content) string {
 
 	content.parseTags()
 
@@ -74,10 +74,10 @@ func CreateNewRecord(ctx context.Context, databaseID string, content Content) st
 	}
 	params := notionapi.CreatePageParams{
 		ParentType:             notionapi.ParentTypeDatabase,
-		ParentID:               databaseID,
+		ParentID:               notionConfig.DatabaseID,
 		DatabasePageProperties: &databasePageProperties,
 	}
-	client := GetNotionClient(config.GetConfig().Notion.BearerToken)
+	client := notionapi.NewClient(notionConfig.BearerToken, nil)
 	page, err := client.CreatePage(ctx, params)
 	var msg string
 	if err != nil {
