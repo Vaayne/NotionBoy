@@ -13,8 +13,5 @@ run:
 	go run ./main.go
 
 rund: build
-	docker run --rm --env-file=.env ghcr.io/vaayne/notion-boy
+	docker run --rm ghcr.io/vaayne/notion-boy
 
-push:
-	GOOS=linux go build -o ./app .
-	scp -P 121  /Users/vaayne/Github/Notion-Boy/app   ubuntu@121.36.78.252:/home/ubuntu
