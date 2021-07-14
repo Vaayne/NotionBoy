@@ -17,7 +17,7 @@ flomo是新一代「卡片笔记工具」，秉承尼克拉斯 · 卢曼（Nikla
 
 但是它有一个致命的问题，我的数据不是我的，我得开会员才能导出我的数据，如图
 
-![NotionBoy%200a4c7970dea048bdbf38e673e4f0465f/Untitled.png](NotionBoy%200a4c7970dea048bdbf38e673e4f0465f/Untitled.png)
+![flomo_pro.png](./docs/imgs/flomo_pro.png)
 
 虽然付费可以导出，但是我还是有一丝不爽，再者我是一个重度 Notion 用户，所以我的数据基本都是放在 Notion 上的，所以也不想再用一个 App 来记录内容。于是就趁机研究来一下 Notion 新发布的 API （[https://developers.notion.com](https://developers.notion.com/)），研究了一下，就想到要做一个属于自己的功能类似于 flomo 的应用。
 
@@ -56,15 +56,15 @@ flomo是新一代「卡片笔记工具」，秉承尼克拉斯 · 卢曼（Nikla
 
 可以参考官方动图 
 
-![NotionBoy%200a4c7970dea048bdbf38e673e4f0465f/Untitled.gif](NotionBoy%200a4c7970dea048bdbf38e673e4f0465f/Untitled.gif)
+![NotionBoy%200a4c7970dea048bdbf38e673e4f0465f/Untitled.gif](./docs/imgs/notionapi_new.gif)
 
-![NotionBoy%200a4c7970dea048bdbf38e673e4f0465f/Untitled%201.gif](NotionBoy%200a4c7970dea048bdbf38e673e4f0465f/Untitled%201.gif)
+![NotionBoy%200a4c7970dea048bdbf38e673e4f0465f/Untitled%201.gif](./docs/imgs/notionapi_page.gif)
 
 ### 绑定微信公众号
 
 微信搜索 `NotionBoy` 并且关注，或者直接扫码关注
 
-![NotionBoy%200a4c7970dea048bdbf38e673e4f0465f/qrcode_for_gh_6ddbff93425a_258.jpg](NotionBoy%200a4c7970dea048bdbf38e673e4f0465f/qrcode_for_gh_6ddbff93425a_258.jpg)
+![qrcode_for_gh.jpg](./docs/imgs/qrcode_for_gh.jpg)
 
 关注之后，会提示绑定
 
@@ -79,15 +79,15 @@ DatabaseID: xxxx
 
 我们把 上面获取的的 Token 和 DatabaseID 按照格式回复就行，如图
 
-![NotionBoy%200a4c7970dea048bdbf38e673e4f0465f/IMG_20210714_222527.jpg](NotionBoy%200a4c7970dea048bdbf38e673e4f0465f/IMG_20210714_222527.jpg)
+![notionboy_binding.jpg](./docs/imgs/notionboy_binding.jpg)
 
 ### 开始记录你的想法
 
 记录想就和聊天一样，如果想把这条记录归类，可以加上 #作为标签，不加没有任何影响，支持任意位置多个 #标签。如图
 
-![NotionBoy%200a4c7970dea048bdbf38e673e4f0465f/IMG_20210714_222955.jpg](NotionBoy%200a4c7970dea048bdbf38e673e4f0465f/IMG_20210714_222955.jpg)
+![notionboy_usage1.jpg](./docs/imgs/notionboy_usage1.jpg)
 
-![NotionBoy%200a4c7970dea048bdbf38e673e4f0465f/IMG_20210714_223047.jpg](NotionBoy%200a4c7970dea048bdbf38e673e4f0465f/IMG_20210714_223047.jpg)
+![notionboy_usage2.jpg](./docs/imgs/notionboy_usage2.jpg)
 
 # DevPlan 未来的开发计划
 
