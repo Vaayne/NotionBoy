@@ -4,6 +4,9 @@ Notion Boy 是一个基于微信公众号和 Notion 快速笔记应用。
 
 完整介绍可以参考 [NotionBoy 的前世今生](https://www.theboys.tech/notion-boy)
 
+## Build Status
+
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/Vaayne/NotionBoy/main.svg)](https://results.pre-commit.ci/latest/github/Vaayne/NotionBoy/main)
 
 ---
 ## 使用 NotionBoy 需要三步
