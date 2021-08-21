@@ -8,7 +8,7 @@ RUN CGO_ENABLED=1 GOOS=linux go build -a -ldflags '-linkmode external -extldflag
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 WORKDIR /service/
+RUN touch data.db
 COPY --from=build_base /go/src/github.com/Vaayne/Notion-Boy/app ./app
 COPY settings.yaml settings.yaml
-COPY data.db data.db
 CMD ["./app"]
