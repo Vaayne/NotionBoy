@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
-	notion "notionboy/internal/pkg/notionapi"
+	notion "notionboy/internal/pkg/notion"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -37,7 +37,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (Respon
 		return resp, nil
 	}
 
-	msg := notion.CreateNewRecord(ctx, &data.Config, &data.Content)
+	msg, _ := notion.CreateNewRecord(ctx, &data.Config, &data.Content)
 
 	resp := Response{
 		StatusCode:      200,

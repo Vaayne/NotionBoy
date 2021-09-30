@@ -17,7 +17,7 @@ rund: build
 
 build-netlify:
 	export GO111MODULE=on
-	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/notion cmd/notionapi/main.go
+	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/notion cmd/notion/main.go
 
 build-wxgzh:
 	export GO111MODULE=on

@@ -1,8 +1,9 @@
 package wxgzh
 
 import (
+	"fmt"
 	"notionboy/internal/pkg/db"
-	notion "notionboy/internal/pkg/notionapi"
+	notion "notionboy/internal/pkg/notion"
 	"notionboy/internal/pkg/utils"
 
 	"github.com/gin-gonic/gin"
@@ -38,7 +39,8 @@ Token: secret_xxx,DatabaseID: xxxx
 `
 			return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText(text)}
 		} else {
-			if checkNotionBinding(c, token, databaseID) {
+			flag, err := notion.BindNotion(c, token, databaseID)
+			if flag {
 				log.Debug("Token is valid, saving account.")
 				db.SaveAccount(&db.Account{
 					NtDatabaseID: databaseID,
@@ -48,7 +50,8 @@ Token: secret_xxx,DatabaseID: xxxx
 				memCache.Delete(userID)
 				return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText("恭喜 🎉 成功绑定 Notion！")}
 			} else {
-				return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText("绑定 Notion 失败，无效的 Token 或 DatabaseID， 请重新绑定！")}
+				msg := fmt.Sprintf("绑定 Notion 失败, 请检查后重新绑定！ 失败原因: %v", err)
+				return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText(msg)}
 			}
 		}
 	}
@@ -59,6 +62,6 @@ Token: secret_xxx,DatabaseID: xxxx
 		return bindNotion(c, msg)
 	}
 
-	res := notion.CreateNewRecord(c, &notion.NotionConfig{BearerToken: accountInfo.NtToken, DatabaseID: accountInfo.NtDatabaseID}, content)
+	res, _ := notion.CreateNewRecord(c, &notion.NotionConfig{BearerToken: accountInfo.NtToken, DatabaseID: accountInfo.NtDatabaseID}, content)
 	return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText(res)}
 }

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"notionboy/internal/pkg/config"
-	notion "notionboy/internal/pkg/notionapi"
+	notion "notionboy/internal/pkg/notion"
 
 	"github.com/gin-gonic/gin"
 	"github.com/silenceper/wechat/v2"
