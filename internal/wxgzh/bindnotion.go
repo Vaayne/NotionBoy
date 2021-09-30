@@ -1,10 +1,9 @@
 package wxgzh
 
 import (
-	"notionboy/config"
-	"notionboy/db"
-	"notionboy/notion"
-	"notionboy/utils"
+	"notionboy/internal/pkg/db"
+	notion "notionboy/internal/pkg/notionapi"
+	"notionboy/internal/pkg/utils"
 	"regexp"
 	"strings"
 	"time"
@@ -45,8 +44,8 @@ func parseBindNotionConfig(text string) (string, string) {
 }
 
 func checkNotionBinding(c *gin.Context, token, databaseID string) bool {
-	content := notion.Content{Text: "#NotionBoy 欢迎🎉使用 Notion Boy!"}
-	res := notion.CreateNewRecord(c, config.Notion{BearerToken: token, DatabaseID: databaseID}, content)
+	content := &notion.Content{Text: "#NotionBoy 欢迎🎉使用 Notion Boy!"}
+	res := notion.CreateNewRecord(c, &notion.NotionConfig{BearerToken: token, DatabaseID: databaseID}, content)
 	return strings.Contains(res, "创建 Note 成功")
 }
 

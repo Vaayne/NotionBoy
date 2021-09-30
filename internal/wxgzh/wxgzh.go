@@ -2,7 +2,7 @@ package wxgzh
 
 import (
 	"fmt"
-	"notionboy/config"
+	"notionboy/internal/pkg/config"
 
 	"github.com/gin-gonic/gin"
 	"github.com/silenceper/wechat/v2"

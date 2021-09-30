@@ -1,10 +1,9 @@
 package wxgzh
 
 import (
-	"notionboy/config"
-	"notionboy/db"
-	"notionboy/notion"
-	"notionboy/utils"
+	"notionboy/internal/pkg/db"
+	notion "notionboy/internal/pkg/notionapi"
+	"notionboy/internal/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/silenceper/wechat/v2/officialaccount/message"
@@ -60,6 +59,6 @@ Token: secret_xxx,DatabaseID: xxxx
 		return bindNotion(c, msg)
 	}
 
-	res := notion.CreateNewRecord(c, config.Notion{BearerToken: accountInfo.NtToken, DatabaseID: accountInfo.NtDatabaseID}, *content)
+	res := notion.CreateNewRecord(c, &notion.NotionConfig{BearerToken: accountInfo.NtToken, DatabaseID: accountInfo.NtDatabaseID}, content)
 	return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText(res)}
 }

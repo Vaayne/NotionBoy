@@ -3,16 +3,10 @@ package main
 import (
 	"context"
 	"encoding/json"
-
-	"fmt"
-	"regexp"
-	"strings"
+	notion "notionboy/internal/pkg/notionapi"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-
-	notionapi "github.com/dstotijn/go-notion"
-	"github.com/sirupsen/logrus"
 )
 
 // Response is of type APIGatewayProxyResponse since we're leveraging the
@@ -22,22 +16,8 @@ import (
 type Response events.APIGatewayProxyResponse
 
 type RequestData struct {
-	Config  NotionConfig `json:"config"`
-	Content Content      `json:"content"`
-}
-
-type Notion interface {
-	ParseContent()
-	CreateNewRecord()
-}
-
-type NotionConfig struct {
-	DatabaseID  string `json:"database_id"`
-	BearerToken string `json:"bearer_token"`
-}
-
-func GetNotionClient(token string) *notionapi.Client {
-	return notionapi.NewClient(token, nil)
+	Config  notion.NotionConfig `json:"config"`
+	Content notion.Content      `json:"content"`
 }
 
 // Handler is our lambda handler invoked by the `lambda.Start` function call
@@ -57,7 +37,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (Respon
 		return resp, nil
 	}
 
-	msg := CreateNewRecord(ctx, &data.Config, &data.Content)
+	msg := notion.CreateNewRecord(ctx, &data.Config, &data.Content)
 
 	resp := Response{
 		StatusCode:      200,

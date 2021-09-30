@@ -1,7 +1,7 @@
 package db
 
 import (
-	"notionboy/config"
+	"notionboy/internal/pkg/config"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"

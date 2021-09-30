@@ -4,9 +4,7 @@ repos:
     hooks:
       - id: go-fmt
         exclude: "^(vendor/.*)$"
-      - id: go-vet
-        exclude: "^(vendor/.*)$"
-      # - id: go-lint
+      # - id: go-vet
       #   exclude: "^(vendor/.*)$"
       - id: go-imports
         exclude: "^(vendor/.*)$"

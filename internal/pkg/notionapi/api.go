@@ -1,30 +1,15 @@
-package main
+package notion
 
 import (
 	"context"
-	"encoding/json"
 
 	"fmt"
 	"regexp"
 	"strings"
 
-	"github.com/aws/aws-lambda-go/events"
-	"github.com/aws/aws-lambda-go/lambda"
-
 	notionapi "github.com/dstotijn/go-notion"
 	"github.com/sirupsen/logrus"
 )
-
-// Response is of type APIGatewayProxyResponse since we're leveraging the
-// AWS Lambda Proxy Request functionality (default behavior)
-//
-// https://serverless.com/framework/docs/providers/aws/events/apigateway/#lambda-proxy-integration
-type Response events.APIGatewayProxyResponse
-
-type RequestData struct {
-	Config  NotionConfig `json:"config"`
-	Content Content      `json:"content"`
-}
 
 type Notion interface {
 	ParseContent()

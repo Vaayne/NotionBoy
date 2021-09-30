@@ -3,8 +3,8 @@ package wxgzh
 import (
 	"fmt"
 	"net/http"
-	"notionboy/config"
-	"notionboy/notion"
+	"notionboy/internal/pkg/config"
+	notion "notionboy/internal/pkg/notionapi"
 
 	"github.com/gin-gonic/gin"
 	"github.com/silenceper/wechat/v2"

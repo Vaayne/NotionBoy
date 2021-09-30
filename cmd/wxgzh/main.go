@@ -1,9 +1,9 @@
 package main
 
 import (
-	"notionboy/config"
-	"notionboy/db"
-	"notionboy/wxgzh"
+	"notionboy/internal/pkg/config"
+	"notionboy/internal/pkg/db"
+	"notionboy/internal/wxgzh"
 )
 
 func main() {
