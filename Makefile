@@ -1,3 +1,4 @@
+.PHONY: build clean
 
 build:
 	docker build -t ghcr.io/vaayne/notion-boy .
@@ -15,3 +16,13 @@ run:
 rund: build
 	docker run --rm ghcr.io/vaayne/notion-boy
 
+build-netlify:
+	export GO111MODULE=on
+	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/notion cmd/notionapi/main.go
+
+build-wxgzh:
+	export GO111MODULE=on
+	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/wxgzh cmd/wxgzh/main.go
+
+clean:
+	rm -rf ./bin ./vendor go.sum
