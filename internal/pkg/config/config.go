@@ -26,7 +26,16 @@ type Notion struct {
 }
 
 type Databases struct {
-	Sqlite Sqlite `mapstructure:"SQLITE"`
+	Sqlite Sqlite        `mapstructure:"SQLITE"`
+	MySQL  DatabaseMySQL `mapstructure:"MYSQL"`
+}
+
+type DatabaseMySQL struct {
+	Host     string `mapstructure:"HOST"`
+	Port     int    `mapstructure:"PORT"`
+	User     string `mapstructure:"USER"`
+	Pass     string `mapstructure:"PASS"`
+	Database string `mapstructure:"DATABASE"`
 }
 
 type Sqlite struct {

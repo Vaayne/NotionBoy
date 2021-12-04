@@ -12,3 +12,9 @@ WECHAT:
 DATABASES:
   SQLITE:
     FILE: data.db
+  MYSQL:
+    HOST: 
+    PORT: 
+    USER: 
+    PASS: 
+    DATABASE: 
