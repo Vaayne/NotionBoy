@@ -61,9 +61,10 @@ func OAuthToken(g *gin.Context) {
 	// oAuthInfo
 	token := tok.AccessToken
 
-	databaseID, err := GetDatabaseID(g, token)
+	databaseID, err := BindNotion(g, token)
 	if err != nil {
 		logrus.Errorf("GetDatabaseID() failed with %v", err)
+		g.Data(http.StatusOK, "text/html; charset=utf-8", []byte("绑定失败，错误详情："+err.Error()))
 		return
 	}
 

@@ -68,6 +68,18 @@ func CreateNewRecord(ctx context.Context, notionConfig *NotionConfig, content *C
 				},
 			},
 		},
+		// todo 后续支持 Name 字段
+		// "Name": notionapi.TitleProperty{
+		// 	Type: "title",
+		// 	Title: []notionapi.RichText{
+		// 		{
+		// 			Type: "text",
+		// 			Text: notionapi.Text{
+		// 				Content: content.Text,
+		// 			},
+		// 		},
+		// 	},
+		// },
 	}
 
 	if multiSelect != nil {
@@ -77,8 +89,8 @@ func CreateNewRecord(ctx context.Context, notionConfig *NotionConfig, content *C
 		}
 	}
 	pageCreateRequest := &notionapi.PageCreateRequest{
-		Parent: notionapi.PageCreateDatabaseParent{
-			DatabaseID: notionConfig.DatabaseID,
+		Parent: notionapi.Parent{
+			DatabaseID: notionapi.DatabaseID(notionConfig.DatabaseID),
 		},
 		Properties: databasePageProperties,
 	}
@@ -108,6 +120,10 @@ func UpdateDatabase(ctx context.Context, notionConfig *NotionConfig) (string, er
 			"Text": notionapi.RichTextPropertyConfig{
 				Type: notionapi.PropertyConfigTypeRichText,
 			},
+			// todo 后续支持 Name 字段
+			// "Name": notionapi.TitlePropertyConfig{
+			// 	Type: notionapi.PropertyConfigTypeTitle,
+			// },
 		},
 	}
 
@@ -123,34 +139,53 @@ func UpdateDatabase(ctx context.Context, notionConfig *NotionConfig) (string, er
 	return msg, err
 }
 
-func BindNotion(ctx context.Context, token, databaseID string) (bool, error) {
+func BindNotion(ctx context.Context, token string) (string, error) {
+	// 获取用户绑定的 Database ID，如果有多个，只取找到的第一个
+	databaseID, err := getDatabaseID(ctx, token)
+	if err != nil {
+		return "", err
+	}
+
 	// 第一次绑定的时候自动建立 Text 和 Tags，确保绑定成功
 	cfg := &NotionConfig{BearerToken: token, DatabaseID: databaseID}
-	_, err := UpdateDatabase(ctx, cfg)
+	msg, err := UpdateDatabase(ctx, cfg)
+	logrus.Infof("Update database: %s", msg)
 	if err != nil {
-		return false, err
+		return "", err
 	}
 
 	content := &Content{Text: "#NotionBoy 欢迎🎉使用 Notion Boy!"}
-	_, err = CreateNewRecord(ctx, cfg, content)
+	msg, err = CreateNewRecord(ctx, cfg, content)
+	logrus.Infof("CreateNewRecord: %s", msg)
 	if err != nil {
-		return false, err
+		return "", err
 	}
-	return true, nil
+	return databaseID, nil
 }
 
-func GetDatabaseID(ctx context.Context, token string) (string, error) {
+func getDatabaseID(ctx context.Context, token string) (string, error) {
 	logrus.Debug("Token is: ", token)
 	cli := GetNotionClient(token)
-	res, err := cli.Database.List(ctx, &notionapi.Pagination{PageSize: 10})
+	searchFilter := make(map[string]string)
+	searchFilter["property"] = "object"
+	searchFilter["value"] = "database"
+	searchReq := notionapi.SearchRequest{
+		PageSize: 1,
+		Filter: map[string]string{
+			"property": "object",
+			"value":    "database",
+		},
+	}
+	res, err := cli.Search.Do(ctx, &searchReq)
 	if err != nil {
 		return "", err
 	}
 	databases := res.Results
 	if len(databases) == 0 {
-		return "", fmt.Errorf("no database found")
+		return "", fmt.Errorf("至少需要绑定一个 Database")
 	}
-	database := databases[0]
-	logrus.Infof("%#v", database)
-	return databases[0].ID.String(), nil
+	database := databases[0].(*notionapi.Database)
+	logrus.Debugf("Find Database: %#v", database)
+	databaseId := database.ID.String()
+	return databaseId, nil
 }
