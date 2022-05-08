@@ -1,12 +1,8 @@
 repos:
-  - repo: https://github.com/dnephin/pre-commit-golang
-    rev: master
+  - repo: https://github.com/tekwizely/pre-commit-golang
+    rev: 03770b120e9a4dddcaf3662059ac0948e97c1825
     hooks:
       - id: go-fmt
-        exclude: "^(vendor/.*)$"
-      # - id: go-vet
-      #   exclude: "^(vendor/.*)$"
       - id: go-imports
-        exclude: "^(vendor/.*)$"
+      - id: go-vet-mod
       - id: go-mod-tidy
-        exclude: "^(vendor/.*)$"
