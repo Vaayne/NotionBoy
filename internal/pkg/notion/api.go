@@ -7,14 +7,9 @@ import (
 	"regexp"
 	"strings"
 
-	notionapi "github.com/jomei/notionapi"
+	"github.com/jomei/notionapi"
 	"github.com/sirupsen/logrus"
 )
-
-type Notion interface {
-	ParseContent()
-	CreateNewRecord()
-}
 
 type NotionConfig struct {
 	DatabaseID  string `json:"database_id"`

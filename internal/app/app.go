@@ -1,9 +1,10 @@
-package wxgzh
+package app
 
 import (
 	"fmt"
 	"notionboy/internal/pkg/config"
 	notion "notionboy/internal/pkg/notion"
+	"notionboy/internal/wxgzh"
 
 	"github.com/gin-gonic/gin"
 	"github.com/silenceper/wechat/v2"
@@ -11,9 +12,15 @@ import (
 
 func Run() {
 	r := gin.Default()
+	initWechat(r)
+	initNotionOauth(r)
+	svc := config.GetConfig().Service
+	r.Run(fmt.Sprintf("%s:%s", svc.Host, svc.Port))
+}
 
+func initWechat(r *gin.Engine) {
 	wc := wechat.NewWechat()
-	account := NewOfficialAccount(wc)
+	account := wxgzh.NewOfficialAccount(wc)
 	r.Any("/", account.Serve)
 	//获取ak
 	r.GET("/api/v1/oa/basic/get_access_token", account.GetAccessToken)
@@ -24,10 +31,10 @@ func Run() {
 	//清理接口调用次数
 	r.GET("/api/v1/oa/basic/clear_quota", account.ClearQuota)
 
-	// Notion OAuth token
+}
+
+func initNotionOauth(r *gin.Engine) {
+
 	r.GET("/notion/oauth", notion.OAuth)
-	// Notion OAuth token
 	r.GET("/notion/oauth/callback", notion.OAuthToken)
-	svc := config.GetConfig().Service
-	r.Run(fmt.Sprintf("%s:%s", svc.Host, svc.Port))
 }

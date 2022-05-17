@@ -1,9 +1,9 @@
 package config
 
 import (
+	"os"
 	"path"
 
-	"github.com/argoproj/pkg/file"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -78,7 +78,7 @@ func LoadConfig(c *Config) {
 		logrus.Error(err)
 	}
 
-	if file.Exists(path.Join(rootPath, "settings_local.yaml")) {
+	if fileExists(path.Join(rootPath, "settings_local.yaml")) {
 		viper.SetConfigName("settings_local")
 		err = viper.MergeInConfig()
 		if err != nil {
@@ -91,4 +91,9 @@ func LoadConfig(c *Config) {
 	if err != nil {
 		logrus.Error(err)
 	}
+}
+
+func fileExists(path string) bool {
+	_, err := os.Stat(path)
+	return !os.IsNotExist(err)
 }

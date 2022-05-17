@@ -13,18 +13,10 @@ static: init
 	pre-commit run --all-files
 
 run:
-	go run ./main.go
+	go run ./cmd/notionboy/main.go
 
 rund: build-docker
 	docker run --rm ${IMAGE_NAME}:${IMAGE_TAG}
-
-build-netlify:
-	export GO111MODULE=on
-	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/notion cmd/notion/main.go
-
-build-wxgzh:
-	export GO111MODULE=on
-	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/wxgzh cmd/wxgzh/main.go
 
 build-docker:
 	docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
