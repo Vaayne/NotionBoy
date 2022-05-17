@@ -28,7 +28,7 @@ func TestUpdateDatabase(t *testing.T) {
 		BearerToken: os.Getenv("BEARER_TOKEN"),
 	}
 
-	respMsg, err := UpdateDatabase(ctx, notionConfig)
+	respMsg, err := updateDatabase(ctx, notionConfig)
 	assert.Nil(t, err, respMsg)
 }
 

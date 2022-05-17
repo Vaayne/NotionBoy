@@ -13,6 +13,18 @@ import (
 	"golang.org/x/oauth2"
 )
 
+type OauthInterface interface {
+	OAuthURL(state string) string
+	OAuthProcess(g *gin.Context)
+	OAuthCallback(g *gin.Context)
+}
+
+type oauthManager struct{}
+
+func GetOauthManager() OauthInterface {
+	return &oauthManager{}
+}
+
 func getOauthConf() *oauth2.Config {
 	logrus.Infof("oauthConf: %#v", config.GetConfig().NotionOauth)
 	return &oauth2.Config{
@@ -25,14 +37,14 @@ func getOauthConf() *oauth2.Config {
 	}
 }
 
-func GetOAuthURL(g *gin.Context, state string) string {
+func (o *oauthManager) OAuthURL(state string) string {
 	// url := "https://notionboy-test.theboys.tech/notion/oauth?state=" + state
 	url := fmt.Sprintf("%s/notion/oauth?state=%s", config.GetConfig().Service.URL, state)
 	logrus.Debugf("Visit the OAuthURL: %v", url)
 	return url
 }
 
-func OAuth(g *gin.Context) {
+func (o *oauthManager) OAuthProcess(g *gin.Context) {
 	state := g.Query("state")
 	oauthConf := getOauthConf()
 	url := oauthConf.AuthCodeURL(state, oauth2.AccessTypeOffline)
@@ -40,7 +52,7 @@ func OAuth(g *gin.Context) {
 	g.Redirect(302, url)
 }
 
-func OAuthToken(g *gin.Context) {
+func (o *oauthManager) OAuthCallback(g *gin.Context) {
 	code := g.Query("code")
 	state := g.Query("state")
 	if code == "" || state == "" {
@@ -61,7 +73,7 @@ func OAuthToken(g *gin.Context) {
 	// oAuthInfo
 	token := tok.AccessToken
 
-	databaseID, err := BindNotion(g, token)
+	databaseID, err := bindNotion(g, token)
 	if err != nil {
 		logrus.Errorf("GetDatabaseID() failed with %v", err)
 		g.Data(http.StatusOK, "text/html; charset=utf-8", []byte("绑定失败，错误详情："+err.Error()))

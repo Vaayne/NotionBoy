@@ -34,7 +34,7 @@ func initWechat(r *gin.Engine) {
 }
 
 func initNotionOauth(r *gin.Engine) {
-
-	r.GET("/notion/oauth", notion.OAuth)
-	r.GET("/notion/oauth/callback", notion.OAuthToken)
+	oauthMgr := notion.GetOauthManager()
+	r.GET("/notion/oauth", oauthMgr.OAuthProcess)
+	r.GET("/notion/oauth/callback", oauthMgr.OAuthCallback)
 }

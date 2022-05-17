@@ -21,7 +21,8 @@ func bindNotion(c *gin.Context, msg *message.MixMessage) *message.Reply {
 	userID := msg.GetOpenID()
 	userType := db.UserTypeWechat
 	stage := fmt.Sprintf("%s:%s", userType, userID)
-	url := notion.GetOAuthURL(c, stage)
+	oauthMgr := notion.GetOauthManager()
+	url := oauthMgr.OAuthURL(stage)
 	log.Info("OAuthURL: ", url)
 	text := config.BindNotionText
 	text += url
