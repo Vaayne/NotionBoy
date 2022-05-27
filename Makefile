@@ -3,7 +3,8 @@
 IMAGE_NAME ?= ghcr.io/vaayne/notionboy
 IMAGE_TAG ?= latest
 
-build: build-wxgzh build-netlify
+build:
+	go build -o ./bin/notionboy ./cmd/notionboy/main.go
 
 init:
 	if ! which pre-commit > /dev/null; then pip install pre-commit; fi
