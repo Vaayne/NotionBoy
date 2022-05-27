@@ -1,4 +1,4 @@
-FROM golang:1.17 as build_base
+FROM golang:1.18 as build_base
 
 WORKDIR /go/src/github.com/Vaayne/Notion-Boy
 COPY . .

@@ -54,7 +54,7 @@ func (ex *OfficialAccount) Serve(c *gin.Context) {
 	server.SkipValidate(true)
 	//设置接收消息的处理方法
 	server.SetMessageHandler(func(msg *message.MixMessage) *message.Reply {
-		return messageHandler(c, msg)
+		return ex.messageHandler(c, msg)
 	})
 
 	//处理消息接收以及回复

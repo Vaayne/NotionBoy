@@ -13,6 +13,7 @@ type Config struct {
 	Service     Service     `mapstructure:"SERVICE"`
 	Databases   Databases   `mapstructure:"DATABASES"`
 	NotionOauth NotionOauth `mapstructure:"NOTION_OAUTH"`
+	R2Config    R2Config    `mapstructure:"R2_CONFIG"`
 }
 
 type Service struct {
@@ -59,7 +60,17 @@ type Wechat struct {
 	EncodingAESKey string `mapstructure:"ENCODING_AES_KEY"`
 }
 
+type R2Config struct {
+	Token string `mapstructure:"TOKEN"`
+	Url   string `mapstructure:"URL"`
+}
+
 var globalConfig = &Config{}
+
+func init() {
+	logrus.Debug("init config")
+	LoadConfig(globalConfig)
+}
 
 func GetConfig() *Config {
 	if globalConfig == nil {

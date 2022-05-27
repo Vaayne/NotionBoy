@@ -10,10 +10,14 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func messageHandler(c *gin.Context, msg *message.MixMessage) *message.Reply {
+func (ex *OfficialAccount) messageHandler(c *gin.Context, msg *message.MixMessage) *message.Reply {
 
 	if msg.MsgType == message.MsgType(message.EventSubscribe) {
 		return bindNotion(c, msg)
+	}
+
+	if msg.MsgType == message.MsgType(message.EventUnsubscribe) {
+		return unBindingNotion(c, msg)
 	}
 
 	userID := msg.GetOpenID()
@@ -34,6 +38,20 @@ func messageHandler(c *gin.Context, msg *message.MixMessage) *message.Reply {
 		return bindNotion(c, msg)
 	}
 
-	res, _ := notion.CreateNewRecord(c, &notion.NotionConfig{BearerToken: accountInfo.AccessToken, DatabaseID: accountInfo.DatabaseID}, content)
-	return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText(res)}
+	switch msg.MsgType {
+	case message.MsgTypeText:
+		// 保存文本信息到 Notion
+		res, _ := notion.CreateNewRecord(c, &notion.NotionConfig{BearerToken: accountInfo.AccessToken, DatabaseID: accountInfo.DatabaseID}, content)
+		return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText(res)}
+	case message.MsgTypeImage, message.MsgTypeVideo, message.MsgTypeVoice:
+		// 保存媒体信息到 Notion
+		media := NewMedia(ex.officialAccount.GetContext())
+		getMediaResp, err := media.getMedia(c, msg.MediaID, accountInfo.DatabaseID)
+		if err != nil {
+			return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText(err.Error())}
+		}
+		res, _ := notion.CreateNewMediaRecord(c, &notion.NotionConfig{BearerToken: accountInfo.AccessToken, DatabaseID: accountInfo.DatabaseID}, getMediaResp.R2URL, getMediaResp.ContentType)
+		return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText(res)}
+	}
+	return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText("Unsupport Message!")}
 }

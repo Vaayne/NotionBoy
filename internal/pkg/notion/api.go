@@ -2,6 +2,7 @@ package notion
 
 import (
 	"context"
+	"time"
 
 	"fmt"
 	"regexp"
@@ -88,6 +89,105 @@ func CreateNewRecord(ctx context.Context, notionConfig *NotionConfig, content *C
 		},
 		Properties: databasePageProperties,
 	}
+	client := notionapi.NewClient(notionapi.Token(notionConfig.BearerToken), func(c *notionapi.Client) {})
+	page, err := client.Page.Create(ctx, pageCreateRequest)
+	var msg string
+	if err != nil {
+		msg = fmt.Sprintf("创建 Note 失败，失败原因, %v", err)
+		logrus.Error(msg)
+	} else {
+		pageID := strings.Replace(page.ID.String(), "-", "", -1)
+		msg = fmt.Sprintf("创建 Note 成功，如需编辑更多，请前往 https://www.notion.so/%s", pageID)
+		logrus.Info(msg)
+	}
+	return msg, err
+}
+
+func CreateNewMediaRecord(ctx context.Context, notionConfig *NotionConfig, mediaURL, mediaType string) (string, error) {
+	databasePageProperties := notionapi.Properties{
+		"Name": notionapi.TitleProperty{
+			Type: "title",
+			Title: []notionapi.RichText{
+				{
+					Type: "text",
+					Text: notionapi.Text{
+						Content: "Media " + time.Now().Local().Format(time.RFC3339),
+					},
+				},
+			},
+		},
+	}
+	var mediaBlock notionapi.Block
+	if strings.HasPrefix(mediaType, "image") {
+		mediaBlock = notionapi.ImageBlock{
+			BasicBlock: notionapi.BasicBlock{
+				Object: notionapi.ObjectTypeBlock,
+				Type:   notionapi.BlockTypeImage,
+			},
+			Image: notionapi.Image{
+				Type: "external",
+				External: &notionapi.FileObject{
+					URL: mediaURL,
+				},
+			},
+		}
+	} else if strings.HasPrefix(mediaType, "video") {
+		mediaBlock = notionapi.VideoBlock{
+			BasicBlock: notionapi.BasicBlock{
+				Object: notionapi.ObjectTypeBlock,
+				Type:   notionapi.BlockTypeVideo,
+			},
+			Video: notionapi.Video{
+				Type: "external",
+				External: &notionapi.FileObject{
+					URL: mediaURL,
+				},
+			},
+		}
+	} else {
+		mediaBlock = notionapi.FileBlock{
+			BasicBlock: notionapi.BasicBlock{
+				Object: notionapi.ObjectTypeBlock,
+				Type:   notionapi.BlockTypeFile,
+			},
+			File: notionapi.BlockFile{
+				Type: "external",
+				External: &notionapi.FileObject{
+					URL: mediaURL,
+				},
+			},
+		}
+	}
+
+	pageCreateRequest := &notionapi.PageCreateRequest{
+		Parent: notionapi.Parent{
+			DatabaseID: notionapi.DatabaseID(notionConfig.DatabaseID),
+		},
+		Properties: databasePageProperties,
+		Children: []notionapi.Block{
+			mediaBlock,
+			notionapi.ParagraphBlock{
+				BasicBlock: notionapi.BasicBlock{
+					Object: notionapi.ObjectTypeBlock,
+					Type:   notionapi.BlockTypeParagraph,
+				},
+				Paragraph: notionapi.Paragraph{
+					RichText: []notionapi.RichText{
+						{
+							Type: "text",
+							Text: notionapi.Text{
+								Content: mediaURL,
+								Link: &notionapi.Link{
+									Url: mediaURL,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
 	client := notionapi.NewClient(notionapi.Token(notionConfig.BearerToken), func(c *notionapi.Client) {})
 	page, err := client.Page.Create(ctx, pageCreateRequest)
 	var msg string

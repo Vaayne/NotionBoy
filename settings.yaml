@@ -26,3 +26,7 @@ NOTION_OAUTH:
   REDIRECT_URI:
   AUTH_URL: https://api.notion.com/v1/oauth/authorize?owner=user
   TOKEN_URL: https://api.notion.com/v1/oauth/token
+
+R2_CONFIG:
+  URL:
+  TOKEN:
