@@ -37,11 +37,18 @@ func (ex *OfficialAccount) messageHandler(c *gin.Context, msg *message.MixMessag
 	if accountInfo.ID == 0 {
 		return bindNotion(c, msg)
 	}
+	notionConfig := &notion.NotionConfig{BearerToken: accountInfo.AccessToken, DatabaseID: accountInfo.DatabaseID}
+
+	// 如果不是最新的 Scheam，更新 Schema
+	if !accountInfo.IsLatestSchema {
+		notion.UpdateDatabaseProperties(c, notionConfig)
+		db.UpdateIsLatestSchema(accountInfo.DatabaseID, true)
+	}
 
 	switch msg.MsgType {
 	case message.MsgTypeText:
 		// 保存文本信息到 Notion
-		res, _ := notion.CreateNewRecord(c, &notion.NotionConfig{BearerToken: accountInfo.AccessToken, DatabaseID: accountInfo.DatabaseID}, content)
+		res, _ := notion.CreateNewRecord(c, notionConfig, content)
 		return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText(res)}
 	case message.MsgTypeImage, message.MsgTypeVideo, message.MsgTypeVoice:
 		// 保存媒体信息到 Notion
@@ -50,7 +57,7 @@ func (ex *OfficialAccount) messageHandler(c *gin.Context, msg *message.MixMessag
 		if err != nil {
 			return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText(err.Error())}
 		}
-		res, _ := notion.CreateNewMediaRecord(c, &notion.NotionConfig{BearerToken: accountInfo.AccessToken, DatabaseID: accountInfo.DatabaseID}, getMediaResp.R2URL, getMediaResp.ContentType)
+		res, _ := notion.CreateNewMediaRecord(c, notionConfig, getMediaResp.R2URL, getMediaResp.ContentType)
 		return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText(res)}
 	}
 	return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText("Unsupport Message!")}

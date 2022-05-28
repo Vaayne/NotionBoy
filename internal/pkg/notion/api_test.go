@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/jomei/notionapi"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
@@ -28,7 +29,7 @@ func TestUpdateDatabase(t *testing.T) {
 		BearerToken: os.Getenv("BEARER_TOKEN"),
 	}
 
-	respMsg, err := updateDatabase(ctx, notionConfig)
+	respMsg, err := updateDatabase(ctx, notionConfig, &notionapi.DatabaseUpdateRequest{})
 	assert.Nil(t, err, respMsg)
 }
 

@@ -81,10 +81,11 @@ func (o *oauthManager) OAuthCallback(g *gin.Context) {
 	}
 
 	db.SaveAccount(&db.Account{
-		UserID:      userID,
-		UserType:    userType,
-		AccessToken: token,
-		DatabaseID:  databaseID,
+		UserID:         userID,
+		UserType:       userType,
+		AccessToken:    token,
+		DatabaseID:     databaseID,
+		IsLatestSchema: true,
 	})
 	g.Data(http.StatusOK, "text/html; charset=utf-8", []byte(config.BindNotionSuccessResponse))
 }

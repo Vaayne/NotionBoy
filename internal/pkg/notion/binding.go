@@ -15,9 +15,9 @@ func bindNotion(ctx context.Context, token string) (string, error) {
 		return "", err
 	}
 
-	// 第一次绑定的时候自动建立 Text 和 Tags，确保绑定成功
+	// 第一次绑定的时候自动建立 Text 和 Tags 等 DatabaseProperties，确保绑定成功
 	cfg := &NotionConfig{BearerToken: token, DatabaseID: databaseID}
-	msg, err := updateDatabase(ctx, cfg)
+	msg, err := UpdateDatabaseProperties(ctx, cfg)
 	logrus.Infof("Update database: %s", msg)
 	if err != nil {
 		return "", err
@@ -59,8 +59,13 @@ func getDatabaseID(ctx context.Context, token string) (string, error) {
 	return databaseId, nil
 }
 
-func updateDatabase(ctx context.Context, notionConfig *NotionConfig) (string, error) {
-	databaseUpdateRequest := &notionapi.DatabaseUpdateRequest{
+func UpdateDatabaseProperties(ctx context.Context, cfg *NotionConfig) (string, error) {
+	databaseUpdateRequest := defaultDatabaseProperties()
+	return updateDatabase(ctx, cfg, databaseUpdateRequest)
+}
+
+func defaultDatabaseProperties() *notionapi.DatabaseUpdateRequest {
+	return &notionapi.DatabaseUpdateRequest{
 		Properties: notionapi.PropertyConfigs{
 			"Tags": notionapi.MultiSelectPropertyConfig{
 				Type: notionapi.PropertyConfigTypeMultiSelect,
@@ -74,11 +79,25 @@ func updateDatabase(ctx context.Context, notionConfig *NotionConfig) (string, er
 			"Name": notionapi.TitlePropertyConfig{
 				Type: notionapi.PropertyConfigTypeTitle,
 			},
+			"CreatedAt": notionapi.CreatedTimePropertyConfig{
+				Type: notionapi.PropertyConfigCreatedTime,
+			},
+			"UpdatedAt": notionapi.LastEditedTimePropertyConfig{
+				Type: notionapi.PropertyConfigLastEditedTime,
+			},
+			"CreatedBy": notionapi.CreatedByPropertyConfig{
+				Type: notionapi.PropertyConfigCreatedBy,
+			},
+			"UpdatedBy": notionapi.LastEditedByPropertyConfig{
+				Type: notionapi.PropertyConfigLastEditedBy,
+			},
 		},
 	}
+}
 
+func updateDatabase(ctx context.Context, notionConfig *NotionConfig, req *notionapi.DatabaseUpdateRequest) (string, error) {
 	client := notionapi.NewClient(notionapi.Token(notionConfig.BearerToken), func(c *notionapi.Client) {})
-	database, err := client.Database.Update(ctx, notionapi.DatabaseID(notionConfig.DatabaseID), databaseUpdateRequest)
+	database, err := client.Database.Update(ctx, notionapi.DatabaseID(notionConfig.DatabaseID), req)
 	var msg string
 	if err != nil {
 		msg = fmt.Sprintf("Update Database 失败，失败原因, %v", err)

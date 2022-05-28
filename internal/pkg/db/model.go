@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"notionboy/internal/pkg/config"
 
+	"github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -24,6 +25,8 @@ type Account struct {
 	DatabaseID string `gorm:"uniqueIndex,not null,column:database_id"`
 	// Notion access token
 	AccessToken string `gorm:"not null,column:access_token"`
+	// IsLatestSchema is latest schema
+	IsLatestSchema bool `gorm:"column:is_latest_schema;default:false"`
 }
 
 type NotionOauthInfo struct {
@@ -99,4 +102,10 @@ func DeleteWxAccount(wxUserID string) {
 func SaveNotionOauth(info *NotionOauthInfo) {
 	db := GetDBConn()
 	db.Create(info)
+}
+
+func UpdateIsLatestSchema(databaseID string, isLatest bool) {
+	db := GetDBConn()
+	db.Model(&Account{}).Where("database_id = ?", databaseID).Update("is_latest_schema", isLatest)
+	logrus.Debugf("UpdateIsLatestSchema %s %t", databaseID, isLatest)
 }
