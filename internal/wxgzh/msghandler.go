@@ -39,6 +39,7 @@ func (ex *OfficialAccount) messageHandler(c *gin.Context, msg *message.MixMessag
 		return bindNotion(c, msg)
 	}
 
+	// 保存内容到 Notion
 	var ch chan string
 	go func(ch chan string) {
 		notionConfig := &notion.NotionConfig{BearerToken: accountInfo.AccessToken, DatabaseID: accountInfo.DatabaseID}
@@ -67,6 +68,7 @@ func (ex *OfficialAccount) messageHandler(c *gin.Context, msg *message.MixMessag
 		}
 	}(ch)
 
+	// 设置超时时间
 	select {
 	case s := <-ch:
 		return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText(s)}
