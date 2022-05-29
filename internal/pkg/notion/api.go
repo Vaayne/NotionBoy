@@ -104,6 +104,7 @@ func CreateNewRecord(ctx context.Context, notionConfig *NotionConfig, content *C
 }
 
 func CreateNewMediaRecord(ctx context.Context, notionConfig *NotionConfig, mediaURL, mediaType string) (string, error) {
+	loc, _ := time.LoadLocation("Asia/Shanghai")
 	databasePageProperties := notionapi.Properties{
 		"Name": notionapi.TitleProperty{
 			Type: "title",
@@ -111,7 +112,7 @@ func CreateNewMediaRecord(ctx context.Context, notionConfig *NotionConfig, media
 				{
 					Type: "text",
 					Text: notionapi.Text{
-						Content: "Media " + time.Now().Local().Format(time.RFC3339),
+						Content: strings.Title(mediaType) + " " + time.Now().UTC().In(loc).Format(time.RFC3339),
 					},
 				},
 			},

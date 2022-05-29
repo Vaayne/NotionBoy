@@ -4,6 +4,7 @@ import (
 	"notionboy/internal/pkg/db"
 	notion "notionboy/internal/pkg/notion"
 	"notionboy/internal/pkg/utils"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/silenceper/wechat/v2/officialaccount/message"
@@ -11,7 +12,6 @@ import (
 )
 
 func (ex *OfficialAccount) messageHandler(c *gin.Context, msg *message.MixMessage) *message.Reply {
-
 	if msg.MsgType == message.MsgType(message.EventSubscribe) {
 		return bindNotion(c, msg)
 	}
@@ -37,28 +37,41 @@ func (ex *OfficialAccount) messageHandler(c *gin.Context, msg *message.MixMessag
 	if accountInfo.ID == 0 {
 		return bindNotion(c, msg)
 	}
-	notionConfig := &notion.NotionConfig{BearerToken: accountInfo.AccessToken, DatabaseID: accountInfo.DatabaseID}
 
-	// 如果不是最新的 Scheam，更新 Schema
-	if !accountInfo.IsLatestSchema {
-		notion.UpdateDatabaseProperties(c, notionConfig)
-		db.UpdateIsLatestSchema(accountInfo.DatabaseID, true)
-	}
-
-	switch msg.MsgType {
-	case message.MsgTypeText:
-		// 保存文本信息到 Notion
-		res, _ := notion.CreateNewRecord(c, notionConfig, content)
-		return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText(res)}
-	case message.MsgTypeImage, message.MsgTypeVideo, message.MsgTypeVoice:
-		// 保存媒体信息到 Notion
-		media := NewMedia(ex.officialAccount.GetContext())
-		getMediaResp, err := media.getMedia(c, msg.MediaID, accountInfo.DatabaseID)
-		if err != nil {
-			return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText(err.Error())}
+	run := func(ch chan string) {
+		notionConfig := &notion.NotionConfig{BearerToken: accountInfo.AccessToken, DatabaseID: accountInfo.DatabaseID}
+		// 如果不是最新的 Scheam，更新 Schema
+		if !accountInfo.IsLatestSchema {
+			notion.UpdateDatabaseProperties(c, notionConfig)
+			db.UpdateIsLatestSchema(accountInfo.DatabaseID, true)
 		}
-		res, _ := notion.CreateNewMediaRecord(c, notionConfig, getMediaResp.R2URL, getMediaResp.ContentType)
-		return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText(res)}
+
+		switch msg.MsgType {
+		case message.MsgTypeText:
+			// 保存文本信息到 Notion
+			res, _ := notion.CreateNewRecord(c, notionConfig, content)
+			ch <- res
+		case message.MsgTypeImage, message.MsgTypeVideo, message.MsgTypeVoice:
+			// 保存媒体信息到 Notion
+			media := NewMedia(ex.officialAccount.GetContext())
+			getMediaResp, err := media.getMedia(c, msg.MediaID, accountInfo.DatabaseID)
+			if err != nil {
+				ch <- err.Error()
+
+			}
+			res, _ := notion.CreateNewMediaRecord(c, notionConfig, getMediaResp.R2URL, getMediaResp.ContentType)
+			ch <- res
+		default:
+			ch <- "Unsupport Message!"
+		}
 	}
-	return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText("Unsupport Message!")}
+
+	var ch chan string
+	go run(ch)
+	select {
+	case s := <-ch:
+		return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText(s)}
+	case <-time.After(time.Second * 3):
+		return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText("正在处理，请稍后去 Notion 查看")}
+	}
 }
