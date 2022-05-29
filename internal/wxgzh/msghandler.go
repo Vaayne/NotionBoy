@@ -38,7 +38,8 @@ func (ex *OfficialAccount) messageHandler(c *gin.Context, msg *message.MixMessag
 		return bindNotion(c, msg)
 	}
 
-	run := func(ch chan string) {
+	var ch chan string
+	go func(ch chan string) {
 		notionConfig := &notion.NotionConfig{BearerToken: accountInfo.AccessToken, DatabaseID: accountInfo.DatabaseID}
 		// 如果不是最新的 Scheam，更新 Schema
 		if !accountInfo.IsLatestSchema {
@@ -64,10 +65,8 @@ func (ex *OfficialAccount) messageHandler(c *gin.Context, msg *message.MixMessag
 		default:
 			ch <- "Unsupport Message!"
 		}
-	}
+	}(ch)
 
-	var ch chan string
-	go run(ch)
 	select {
 	case s := <-ch:
 		return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText(s)}
