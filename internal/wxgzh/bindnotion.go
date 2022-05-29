@@ -13,7 +13,7 @@ import (
 
 func unBindingNotion(c *gin.Context, msg *message.MixMessage) *message.Reply {
 	db.DeleteWxAccount(msg.GetOpenID())
-	return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText("成功解除 Notion 绑定！")}
+	return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText(config.MSG_UNBIND_SUCCESS)}
 }
 
 func bindNotion(c *gin.Context, msg *message.MixMessage) *message.Reply {
@@ -24,7 +24,7 @@ func bindNotion(c *gin.Context, msg *message.MixMessage) *message.Reply {
 	oauthMgr := notion.GetOauthManager()
 	url := oauthMgr.OAuthURL(stage)
 	log.Info("OAuthURL: ", url)
-	text := config.BindNotionText
+	text := config.MSG_BINDING
 	text += url
 	return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText(text)}
 }

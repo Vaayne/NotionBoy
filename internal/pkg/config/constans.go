@@ -1,7 +1,7 @@
 package config
 
 const (
-	BindNotionSuccessResponse = `<html>
+	MSG_BIND_SUCCESS = `<html>
 <body>
 <h1>恭喜 🎉 成功绑定 Notion</h1>
 <p>
@@ -10,7 +10,7 @@ const (
 </body>
 </html>`
 
-	BindNotionText = `
+	MSG_BINDING = `
 欢迎使用 NotionBoy， 了解更多 NotionBoy 的功能，请参考：https://www.theboys.tech/notion-boy
 
 
@@ -22,4 +22,11 @@ const (
 如果微信打开有问题，请复制 URL 到浏览器打开。
 
 `
+
+	MSG_UNBIND_SUCCESS = "成功解除 Notion 绑定！"
+
+	CMD_BIND       = "绑定"
+	CMD_UNBIND     = "解绑"
+	MSG_UNSUPPOERT = "不支持的消息类型!"
+	MSG_PROCESSING = "正在处理，请稍后去 Notion 查看"
 )

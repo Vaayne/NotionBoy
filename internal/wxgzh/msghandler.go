@@ -1,6 +1,7 @@
 package wxgzh
 
 import (
+	"notionboy/internal/pkg/config"
 	"notionboy/internal/pkg/db"
 	notion "notionboy/internal/pkg/notion"
 	"notionboy/internal/pkg/utils"
@@ -26,9 +27,9 @@ func (ex *OfficialAccount) messageHandler(c *gin.Context, msg *message.MixMessag
 	userCache := memCache.Get(userID)
 	log.Infof("UserID: %s, content: %s, msgType: %s, userCache: %s", userID, content, msg.MsgType, userCache)
 
-	if msg.Content == "绑定" {
+	if msg.Content == config.CMD_BIND {
 		return bindNotion(c, msg)
-	} else if msg.Content == "解绑" {
+	} else if msg.Content == config.CMD_UNBIND {
 		return unBindingNotion(c, msg)
 	}
 
@@ -58,12 +59,11 @@ func (ex *OfficialAccount) messageHandler(c *gin.Context, msg *message.MixMessag
 			getMediaResp, err := media.getMedia(c, msg.MediaID, accountInfo.DatabaseID)
 			if err != nil {
 				ch <- err.Error()
-
 			}
 			res, _ := notion.CreateNewMediaRecord(c, notionConfig, getMediaResp.R2URL, getMediaResp.ContentType)
 			ch <- res
 		default:
-			ch <- "Unsupport Message!"
+			ch <- config.MSG_UNSUPPOERT
 		}
 	}(ch)
 
@@ -71,6 +71,6 @@ func (ex *OfficialAccount) messageHandler(c *gin.Context, msg *message.MixMessag
 	case s := <-ch:
 		return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText(s)}
 	case <-time.After(time.Second * 3):
-		return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText("正在处理，请稍后去 Notion 查看")}
+		return &message.Reply{MsgType: message.MsgTypeText, MsgData: message.NewText(config.MSG_PROCESSING)}
 	}
 }

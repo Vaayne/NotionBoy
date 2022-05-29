@@ -87,5 +87,5 @@ func (o *oauthManager) OAuthCallback(g *gin.Context) {
 		DatabaseID:     databaseID,
 		IsLatestSchema: true,
 	})
-	g.Data(http.StatusOK, "text/html; charset=utf-8", []byte(config.BindNotionSuccessResponse))
+	g.Data(http.StatusOK, "text/html; charset=utf-8", []byte(config.MSG_BIND_SUCCESS))
 }
